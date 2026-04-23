@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SAFe POPM Study Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--accent:#00d4aa;--accent2:#6c63ff;--accent3:#ff6b6b;--accent4:#ffd166;--text:#e8edf5;--muted:#6b7a99;--border:#1e2d42;--success:#22c55e;--wrong:#ef4444;}
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -22,7 +23,7 @@ header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:
 .tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(0,212,170,.05);}
 .container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
 .section-header{margin-bottom:1.75rem;}
-.section-header h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;background:linear-gradient(135deg,var(--text) 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.section-header h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;background:linear-gradient(135deg,var(--text) 30%,var(--accent));background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .section-header p{color:var(--muted);margin-top:.4rem;font-size:.9rem;}
 .domain-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;}
 .pill{padding:6px 16px;border-radius:20px;font-size:.8rem;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .2s;}
@@ -81,7 +82,7 @@ header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:
 .quiz-feedback.wrong-fb{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ff8585;}
 .quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;}
 .results-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;text-align:center;}
-.results-score{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.results-score{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
 .results-label{color:var(--muted);font-size:1rem;margin-top:.5rem;}
 .results-verdict{margin:1.5rem 0;font-size:1.2rem;font-weight:600;padding:.75rem 2rem;border-radius:12px;display:inline-block;}
 .verdict-pass{background:rgba(34,197,94,.15);color:#4ade80;}
@@ -114,6 +115,10 @@ header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:
 .tip-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;opacity:.1;position:absolute;top:.5rem;right:1rem;}
 .tip-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.5rem;}
 .tip-text{font-size:.84rem;color:var(--muted);line-height:1.6;}
+.query-result{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;}
+.query-type{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:.5rem;color:var(--accent);}
+.query-result h4{font-size:1rem;font-weight:600;margin-bottom:.5rem;color:var(--text);}
+.query-result p{margin-bottom:.5rem;color:var(--muted);line-height:1.6;}
 .page{display:none;}
 .page.active{display:block;animation:fadeIn .3s;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -138,6 +143,7 @@ header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:
   <button class="tab" onclick="showPage('quiz')">🎯 Quiz Mode</button>
   <button class="tab" onclick="showPage('cheatsheet')">📋 Cheat Sheet</button>
   <button class="tab" onclick="showPage('tips')">🏆 Exam Tips</button>
+  <button class="tab" onclick="showPage('query')">🔍 Query</button>
 </nav>
 
 <!-- ═══ FLASHCARDS ═══ -->
@@ -352,6 +358,31 @@ header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:
 </div>
 </div>
 
+<!-- ═══ QUERY ═══ -->
+<div id="page-query" class="page">
+<div class="container">
+  <div class="section-header"><h2>Query Search</h2><p>Search flashcards and quiz questions for answers</p></div>
+  <div class="domain-pills">
+    <span class="pill dall active" onclick="setQueryFilter('all',this)">All Sources</span>
+    <span class="pill d1" onclick="setQueryFilter('D1',this)">D1 · Iteration Execution</span>
+    <span class="pill d2" onclick="setQueryFilter('D2',this)">D2 · PI Planning Prep</span>
+    <span class="pill d3" onclick="setQueryFilter('D3',this)">D3 · PO/PM Roles</span>
+    <span class="pill d4" onclick="setQueryFilter('D4',this)">D4 · Leading PI Planning</span>
+    <span class="pill d5" onclick="setQueryFilter('D5',this)">D5 · PI Execution</span>
+  </div>
+  <div style="margin-bottom:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;align-items:center;">
+    <input type="file" id="docUpload" accept=".txt,.md,.pdf" multiple style="padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);">
+    <button class="btn btn-ghost" onclick="uploadDocs()">📎 Upload Docs</button>
+    <input type="url" id="docUrl" placeholder="Google Drive PDF URL (public link)" style="flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);">
+    <button class="btn btn-ghost" onclick="uploadFromUrl()">🌐 Upload from URL</button>
+    <button class="btn btn-warn" onclick="clearDocs()">🗑️ Clear Docs</button>
+    <input type="text" id="queryInput" placeholder="Ask a question..." style="flex:1;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--text);font-size:.9rem;" onkeypress="if(event.key==='Enter') performSearch()">
+    <button class="btn btn-primary" onclick="performSearch()">🤖 Ask Agent</button>
+  </div>
+  <div id="queryResults"></div>
+</div>
+</div>
+
 <script>
 // ═══════════════════════════════════════════════
 //  FLASHCARD DATA (55 cards)
@@ -522,6 +553,32 @@ let quizFilter='all',activeQuiz=[],qIndex=0,qScore=0,qAnswered=false;
 let qTimer=null,qTimeLeft=5400,selectedOpts=new Set();
 let totalScore=0,totalAttempted=0;
 let domainScores={D1:{c:0,t:0},D2:{c:0,t:0},D3:{c:0,t:0},D4:{c:0,t:0},D5:{c:0,t:0}};
+let queryFilter='all';
+let uploadedDocs=[];
+
+// Load persisted data
+function loadPersistedData(){
+  const savedDocs = localStorage.getItem('uploadedDocs');
+  if (savedDocs) {
+    uploadedDocs = JSON.parse(savedDocs);
+  }
+  const savedFilter = localStorage.getItem('queryFilter');
+  if (savedFilter) {
+    queryFilter = savedFilter;
+    // Update UI
+    document.querySelectorAll('#page-query .pill').forEach(p=>p.classList.remove('active'));
+    document.querySelector(`#page-query .pill.${queryFilter === 'all' ? 'dall' : 'd' + queryFilter}`).classList.add('active');
+  }
+}
+
+// Save data
+function saveUploadedDocs(){
+  localStorage.setItem('uploadedDocs', JSON.stringify(uploadedDocs));
+}
+
+function saveQueryFilter(){
+  localStorage.setItem('queryFilter', queryFilter);
+}
 
 // ═══════════════════════════════════════════════
 //  NAV
@@ -530,7 +587,7 @@ function showPage(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('page-'+id).classList.add('active');
-  ['flashcards','quiz','cheatsheet','tips'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
+  ['flashcards','quiz','cheatsheet','tips','query'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
 }
 
 // ═══════════════════════════════════════════════
@@ -576,6 +633,11 @@ renderCard();
 function setQuizFilter(f,el){
   document.querySelectorAll('#quizStart .pill').forEach(p=>p.classList.remove('active'));
   el.classList.add('active');quizFilter=f;
+}
+function setQueryFilter(f,el){
+  document.querySelectorAll('#page-query .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');queryFilter=f;
+  saveQueryFilter();
 }
 function startQuiz(count,seconds){
   let pool=quizFilter==='all'?[...quizData]:quizData.filter(q=>q.domain===quizFilter);
@@ -691,6 +753,157 @@ function restartQuiz(){
   document.getElementById('quizStart').style.display='block';
   document.getElementById('qTimer').style.color='var(--accent4)';
 }
+
+// ═══════════════════════════════════════════════
+//  QUERY SEARCH
+// ═══════════════════════════════════════════════
+function uploadDocs(){
+  const files = document.getElementById('docUpload').files;
+  if (files.length === 0) return;
+  for (let file of files) {
+    if (file.type === 'application/pdf') {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const typedarray = new Uint8Array(e.target.result);
+        pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+          let text = '';
+          const promises = [];
+          for (let i = 1; i <= pdf.numPages; i++) {
+            promises.push(pdf.getPage(i).then(page => page.getTextContent()).then(content => {
+              text += content.items.map(item => item.str).join(' ') + '\n';
+            }));
+          }
+          Promise.all(promises).then(() => {
+            uploadedDocs.push({name: file.name, content: text.toLowerCase()});
+            saveUploadedDocs();
+            alert(`Uploaded: ${file.name}`);
+          });
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        uploadedDocs.push({name: file.name, content: e.target.result.toLowerCase()});
+        saveUploadedDocs();
+        alert(`Uploaded: ${file.name}`);
+      };
+      reader.readAsText(file);
+    }
+  }
+}
+function uploadFromUrl(){
+  const url = document.getElementById('docUrl').value.trim();
+  if (!url) return;
+  // Extract FILE_ID from Google Drive URL
+  const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (!match) { alert('Invalid Google Drive URL. Use the share link like: https://drive.google.com/file/d/FILE_ID/view'); return; }
+  const fileId = match[1];
+  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  fetch(downloadUrl)
+    .then(response => {
+      if (!response.ok) throw new Error('Failed to fetch PDF. Ensure the file is publicly shared.');
+      return response.blob();
+    })
+    .then(blob => {
+      const fileReader = new FileReader();
+      fileReader.onload = function() {
+        const typedarray = new Uint8Array(this.result);
+        pdfjsLib.getDocument(typedarray).promise.then(function(pdf) {
+          let text = '';
+          const promises = [];
+          for (let i = 1; i <= pdf.numPages; i++) {
+            promises.push(pdf.getPage(i).then(page => page.getTextContent()).then(content => {
+              text += content.items.map(item => item.str).join(' ') + '\n';
+            }));
+          }
+          Promise.all(promises).then(() => {
+            uploadedDocs.push({name: `Google Drive PDF (${fileId})`, content: text.toLowerCase()});
+            saveUploadedDocs();
+            alert('PDF uploaded from Google Drive');
+          });
+        }).catch(err => alert('Error parsing PDF: ' + err));
+      };
+      fileReader.readAsArrayBuffer(blob);
+    })
+    .catch(err => alert('Error fetching PDF: ' + err.message));
+}
+function clearDocs(){
+  if (confirm('Clear all uploaded documents? This cannot be undone.')) {
+    uploadedDocs = [];
+    saveUploadedDocs();
+    alert('Uploaded documents cleared.');
+  }
+}
+function performSearch(){
+  const query = document.getElementById('queryInput').value.toLowerCase().trim();
+  if (!query) return;
+  let results = [];
+  // Search flashcards
+  let flashPool = queryFilter === 'all' ? flashcards : flashcards.filter(c => c.domain === queryFilter);
+  flashPool.forEach(card => {
+    if (card.q.toLowerCase().includes(query) || card.a.toLowerCase().includes(query) || card.tag.toLowerCase().includes(query)) {
+      results.push({type: 'flashcard', data: card});
+    }
+  });
+  // Search quiz
+  let quizPool = queryFilter === 'all' ? quizData : quizData.filter(q => q.domain === queryFilter);
+  quizPool.forEach(q => {
+    if (q.q.toLowerCase().includes(query) || q.explanation.toLowerCase().includes(query)) {
+      results.push({type: 'quiz', data: q});
+    }
+  });
+  // Search uploaded docs
+  uploadedDocs.forEach(doc => {
+    if (doc.content.includes(query)) {
+      const snippet = getSnippet(doc.content, query);
+      results.push({type: 'document', data: {name: doc.name, snippet: snippet}});
+    }
+  });
+  // Display results
+  const container = document.getElementById('queryResults');
+  container.innerHTML = '';
+  if (results.length === 0) {
+    container.innerHTML = '<p style="color:var(--muted);text-align:center;padding:2rem;">No results found. Try different keywords, domain, or upload documents/PDFs.</p>';
+    return;
+  }
+  results.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'query-result';
+    if (r.type === 'flashcard') {
+      div.innerHTML = `
+        <div class="query-type">📄 Flashcard</div>
+        <h4>${r.data.q}</h4>
+        <p>${r.data.a.replace(/\n/g, '<br>')}</p>
+        <small style="color:var(--muted);">${r.data.src} · ${r.data.domain} · ${r.data.tag}</small>
+      `;
+    } else if (r.type === 'quiz') {
+      div.innerHTML = `
+        <div class="query-type">🎯 Quiz Question</div>
+        <h4>${r.data.q}</h4>
+        <p><strong>Correct Answer(s):</strong> ${r.data.opts.filter((_,i)=>r.data.correct.includes(i)).join(' · ')}</p>
+        <p>${r.data.explanation}</p>
+        <small style="color:var(--muted);">${r.data.domain}</small>
+      `;
+    } else if (r.type === 'document') {
+      div.innerHTML = `
+        <div class="query-type">📄 Uploaded Document</div>
+        <h4>${r.data.name}</h4>
+        <p>${r.data.snippet}</p>
+      `;
+    }
+    container.appendChild(div);
+  });
+}
+function getSnippet(content, query) {
+  const index = content.indexOf(query);
+  const start = Math.max(0, index - 100);
+  const end = Math.min(content.length, index + query.length + 100);
+  return '...' + content.substring(start, end) + '...';
+}
+
+// Initialize on page load
+loadPersistedData();
 </script>
 </body>
 </html>
