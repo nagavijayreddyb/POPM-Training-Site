@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SAFe POPM Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--accent:#00d4aa;--accent2:#6c63ff;--accent3:#ff6b6b;--accent4:#ffd166;--text:#e8edf5;--muted:#6b7a99;--border:#1e2d42;--success:#22c55e;--wrong:#ef4444;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+header{background:linear-gradient(135deg,#0d1b2e,#0a1628,#0d1520);border-bottom:1px solid var(--border);padding:0 2rem;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;height:64px;}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.25rem;letter-spacing:-.5px;}
+.logo span{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:.75rem;}
+.score-badge{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:6px 16px;font-size:.85rem;color:var(--accent4);font-weight:500;}
+.q-count-badge{background:rgba(0,212,170,.1);border:1px solid rgba(0,212,170,.25);border-radius:20px;padding:5px 13px;font-size:.78rem;color:var(--accent);font-weight:600;}
+.tabs{display:flex;gap:0;background:var(--surface);border-bottom:1px solid var(--border);overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab{padding:14px 22px;font-family:'Syne',sans-serif;font-size:.82rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:none;background:transparent;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s;}
+.tab:hover{color:var(--text);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(0,212,170,.05);}
+.container{max-width:1100px;margin:0 auto;padding:2rem 1.5rem;}
+.section-header{margin-bottom:1.75rem;}
+.section-header h2{font-family:'Syne',sans-serif;font-weight:800;font-size:1.6rem;background:linear-gradient(135deg,var(--text) 30%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.section-header p{color:var(--muted);margin-top:.4rem;font-size:.9rem;}
+.domain-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.5rem;}
+.pill{padding:6px 16px;border-radius:20px;font-size:.8rem;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .2s;}
+.pill.d1{background:rgba(108,99,255,.15);color:#a89cff;border-color:rgba(108,99,255,.3);}
+.pill.d2{background:rgba(0,212,170,.12);color:var(--accent);border-color:rgba(0,212,170,.3);}
+.pill.d3{background:rgba(255,107,107,.12);color:#ff8585;border-color:rgba(255,107,107,.3);}
+.pill.d4{background:rgba(255,209,102,.12);color:var(--accent4);border-color:rgba(255,209,102,.3);}
+.pill.d5{background:rgba(56,189,248,.12);color:#7dd3fc;border-color:rgba(56,189,248,.3);}
+.pill.dall{background:rgba(255,255,255,.08);color:var(--text);border-color:rgba(255,255,255,.15);}
+.pill.active,.pill:hover{filter:brightness(1.3);border-color:currentColor;}
+.progress-track{height:4px;background:var(--surface2);border-radius:4px;margin-bottom:1rem;max-width:700px;margin-left:auto;margin-right:auto;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:4px;transition:width .3s;}
+.flashcard-area{perspective:1200px;}
+.flashcard-wrap{position:relative;width:100%;max-width:700px;margin:0 auto;}
+.card-counter{text-align:center;color:var(--muted);font-size:.85rem;margin-bottom:1rem;}
+.flashcard{width:100%;min-height:280px;position:relative;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1);cursor:pointer;}
+.flashcard.flipped{transform:rotateY(180deg);}
+.card-face{position:absolute;width:100%;min-height:280px;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2.5rem;text-align:center;}
+.card-front{background:linear-gradient(145deg,var(--surface2),var(--surface));border:1px solid var(--border);}
+.card-back{background:linear-gradient(145deg,rgba(0,212,170,.12),rgba(108,99,255,.08));border:1px solid rgba(0,212,170,.3);transform:rotateY(180deg);}
+.card-tag{font-size:.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:4px 12px;border-radius:10px;margin-bottom:1.2rem;}
+.card-front .card-tag{background:rgba(108,99,255,.2);color:#a89cff;}
+.card-back .card-tag{background:rgba(0,212,170,.2);color:var(--accent);}
+.card-question{font-size:1.1rem;font-weight:500;line-height:1.55;color:var(--text);}
+.card-answer{font-size:.98rem;line-height:1.65;color:var(--text);white-space:pre-line;}
+.card-hint{margin-top:1rem;font-size:.82rem;color:var(--muted);font-style:italic;}
+.flip-hint{text-align:center;color:var(--muted);font-size:.8rem;margin-top:.75rem;}
+.card-controls{display:flex;gap:.75rem;justify-content:center;margin-top:1.5rem;flex-wrap:wrap;}
+.source-tag{display:inline-block;font-size:.68rem;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.06);color:var(--muted);margin-top:.75rem;letter-spacing:.4px;}
+.btn{padding:10px 22px;border-radius:12px;font-size:.88rem;font-weight:500;cursor:pointer;border:none;font-family:'DM Sans',sans-serif;transition:all .2s;letter-spacing:.3px;}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border);}
+.btn-ghost:hover{background:var(--surface);border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#00b894);color:#000;font-weight:600;}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px);}
+.btn-warn{background:rgba(255,209,102,.12);color:var(--accent4);border:1px solid rgba(255,209,102,.3);}
+.quiz-progress{background:var(--surface2);border-radius:8px;height:6px;margin-bottom:1.5rem;overflow:hidden;}
+.quiz-progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:8px;transition:width .4s ease;}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:.75rem;}
+.quiz-q-num{font-family:'Syne',sans-serif;font-size:.85rem;color:var(--muted);}
+.quiz-timer{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:var(--accent4);background:rgba(255,209,102,.1);padding:4px 12px;border-radius:8px;}
+.quiz-question-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:2rem;margin-bottom:1.25rem;}
+.quiz-domain-tag{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;padding:3px 10px;border-radius:8px;margin-bottom:.75rem;}
+.quiz-question{font-size:1.08rem;font-weight:500;line-height:1.6;color:var(--text);}
+.ms-note{font-size:.8rem;color:var(--accent4);margin-top:.5rem;font-style:italic;}
+.options{display:flex;flex-direction:column;gap:.6rem;}
+.option{background:var(--surface2);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;cursor:pointer;font-size:.93rem;display:flex;align-items:center;gap:.75rem;transition:all .2s;color:var(--text);}
+.option:hover:not(.locked){border-color:var(--accent2);background:rgba(108,99,255,.08);}
+.option.selected{border-color:var(--accent2);background:rgba(108,99,255,.12);color:#c4beff;}
+.option.correct{border-color:var(--success)!important;background:rgba(34,197,94,.1)!important;color:#4ade80!important;}
+.option.wrong{border-color:var(--wrong)!important;background:rgba(239,68,68,.08)!important;color:#ff8585!important;}
+.option.locked{cursor:default;}
+.opt-key{min-width:28px;height:28px;border-radius:6px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;font-family:'Syne',sans-serif;flex-shrink:0;}
+.quiz-feedback{border-radius:14px;padding:1rem 1.25rem;margin-top:1rem;display:none;font-size:.88rem;line-height:1.55;}
+.quiz-feedback.show{display:block;animation:fadeIn .3s;}
+.quiz-feedback.correct-fb{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:#4ade80;}
+.quiz-feedback.wrong-fb{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);color:#ff8585;}
+.quiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;}
+.results-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:3rem;text-align:center;}
+.results-score{font-family:'Syne',sans-serif;font-size:5rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.results-label{color:var(--muted);font-size:1rem;margin-top:.5rem;}
+.results-verdict{margin:1.5rem 0;font-size:1.2rem;font-weight:600;padding:.75rem 2rem;border-radius:12px;display:inline-block;}
+.verdict-pass{background:rgba(34,197,94,.15);color:#4ade80;}
+.verdict-fail{background:rgba(239,68,68,.12);color:#ff8585;}
+.results-breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin:2rem 0;}
+.rb-item{background:var(--surface2);border-radius:14px;padding:1rem;border:1px solid var(--border);}
+.rb-val{font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:800;}
+.rb-key{font-size:.8rem;color:var(--muted);margin-top:.3rem;}
+.domain-breakdown{margin:1.5rem 0;text-align:left;}
+.db-row{display:flex;align-items:center;gap:1rem;margin-bottom:.65rem;}
+.db-label{font-size:.8rem;color:var(--muted);min-width:150px;flex-shrink:0;}
+.db-bar{flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;}
+.db-fill{height:100%;border-radius:4px;transition:width 1.2s ease;}
+.db-pct{font-size:.82rem;font-weight:600;min-width:36px;text-align:right;}
+.cheat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.25rem;}
+.cheat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.cheat-head{padding:.85rem 1.25rem;font-family:'Syne',sans-serif;font-size:.8rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;}
+.cheat-body{padding:1.25rem;}
+.cheat-row{display:flex;gap:1rem;padding:.6rem 0;border-bottom:1px solid var(--border);align-items:flex-start;}
+.cheat-row:last-child{border:none;}
+.cheat-key{font-weight:600;min-width:130px;font-size:.83rem;color:var(--text);flex-shrink:0;}
+.cheat-val{font-size:.81rem;color:var(--muted);line-height:1.5;}
+.tips-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.tip-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:1.5rem;position:relative;overflow:hidden;}
+.tip-card::before{content:'';position:absolute;top:0;left:0;width:4px;height:100%;}
+.tip-card.t1::before{background:var(--accent);}
+.tip-card.t2::before{background:var(--accent2);}
+.tip-card.t3::before{background:var(--accent3);}
+.tip-card.t4::before{background:var(--accent4);}
+.tip-num{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;opacity:.1;position:absolute;top:.5rem;right:1rem;}
+.tip-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;margin-bottom:.5rem;}
+.tip-text{font-size:.84rem;color:var(--muted);line-height:1.6;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .3s;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.tag-d1{background:rgba(108,99,255,.2);color:#a89cff;}
+.tag-d2{background:rgba(0,212,170,.15);color:var(--accent);}
+.tag-d3{background:rgba(255,107,107,.15);color:#ff8585;}
+.tag-d4{background:rgba(255,209,102,.15);color:var(--accent4);}
+.tag-d5{background:rgba(56,189,248,.15);color:#7dd3fc;}
+@media(max-width:600px){.tab{padding:11px 11px;font-size:.72rem;}.card-face{padding:1.75rem 1.25rem;}.quiz-question-card{padding:1.5rem 1rem;}.results-breakdown{grid-template-columns:1fr 1fr;}.cheat-grid,.tips-grid{grid-template-columns:1fr;}.q-count-badge{display:none;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">SAFe <span>POPM</span> Study Hub</div>
+  <div class="header-right">
+    <div class="q-count-badge">90 Questions</div>
+    <div class="score-badge" id="globalScore">Score: 0 / 0</div>
+  </div>
+</header>
+<nav class="tabs">
+  <button class="tab active" onclick="showPage('flashcards')">⚡ Flashcards</button>
+  <button class="tab" onclick="showPage('quiz')">🎯 Quiz Mode</button>
+  <button class="tab" onclick="showPage('cheatsheet')">📋 Cheat Sheet</button>
+  <button class="tab" onclick="showPage('tips')">🏆 Exam Tips</button>
+</nav>
+
+<!-- ═══ FLASHCARDS ═══ -->
+<div id="page-flashcards" class="page active">
+<div class="container">
+  <div class="section-header"><h2>Flashcards</h2><p>55 cards · 5 domains · Click to flip · Arrow keys to navigate · Space to flip</p></div>
+  <div class="domain-pills">
+    <span class="pill dall active" onclick="filterCards('all',this)">All (55)</span>
+    <span class="pill d1" onclick="filterCards('D1',this)">D1 · Iteration Execution</span>
+    <span class="pill d2" onclick="filterCards('D2',this)">D2 · PI Planning Prep</span>
+    <span class="pill d3" onclick="filterCards('D3',this)">D3 · PO/PM Roles</span>
+    <span class="pill d4" onclick="filterCards('D4',this)">D4 · Leading PI Planning</span>
+    <span class="pill d5" onclick="filterCards('D5',this)">D5 · PI Execution</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="cardProgress" style="width:0%"></div></div>
+  <div class="flashcard-area">
+    <div class="flashcard-wrap">
+      <div class="card-counter" id="cardCounter">Card 1 of 55</div>
+      <div class="flashcard" id="theCard" onclick="flipCard()">
+        <div class="card-face card-front">
+          <div class="card-tag" id="cardTag">Domain</div>
+          <div class="card-question" id="cardQuestion">Loading…</div>
+          <div class="card-hint">Click to reveal answer ↓</div>
+        </div>
+        <div class="card-face card-back">
+          <div class="card-tag">Answer</div>
+          <div class="card-answer" id="cardAnswer">…</div>
+          <div class="source-tag" id="cardSource"></div>
+        </div>
+      </div>
+      <div class="flip-hint">↩ click · Space = flip · ← → = navigate</div>
+      <div class="card-controls">
+        <button class="btn btn-ghost" onclick="prevCard()">← Prev</button>
+        <button class="btn btn-warn" onclick="shuffleCards()">🔀 Shuffle</button>
+        <button class="btn btn-ghost" onclick="nextCard()">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ QUIZ ═══ -->
+<div id="page-quiz" class="page">
+<div class="container">
+  <div class="section-header"><h2>Quiz Mode</h2><p>90 questions · select up to 45 per session · 80% to pass · mirrors SAFe POPM exam format</p></div>
+  <div id="quizStart">
+    <div class="domain-pills">
+      <span class="pill dall active" id="qf-all" onclick="setQuizFilter('all',this)">All Domains</span>
+      <span class="pill d1" id="qf-D1" onclick="setQuizFilter('D1',this)">D1 · Iteration</span>
+      <span class="pill d2" id="qf-D2" onclick="setQuizFilter('D2',this)">D2 · PI Prep</span>
+      <span class="pill d3" id="qf-D3" onclick="setQuizFilter('D3',this)">D3 · Roles</span>
+      <span class="pill d4" id="qf-D4" onclick="setQuizFilter('D4',this)">D4 · Lead PI</span>
+      <span class="pill d5" id="qf-D5" onclick="setQuizFilter('D5',this)">D5 · PI Exec</span>
+    </div>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-top:1rem;">
+      <button class="btn btn-primary" onclick="startQuiz(45,5400)">▶ Full Exam (45 Q · 90 min)</button>
+      <button class="btn btn-ghost" onclick="startQuiz(15,900)">⚡ Quick 15 Questions</button>
+    </div>
+  </div>
+  <div id="quizActive" style="display:none">
+    <div class="quiz-meta">
+      <div class="quiz-q-num" id="qNum">Q1 / 45</div>
+      <div class="quiz-timer" id="qTimer">90:00</div>
+    </div>
+    <div class="quiz-progress"><div class="quiz-progress-fill" id="qProgress" style="width:0%"></div></div>
+    <div class="quiz-question-card">
+      <div class="quiz-domain-tag" id="qDomainTag"></div>
+      <div class="quiz-question" id="qText"></div>
+      <div class="ms-note" id="qMsNote" style="display:none">⚠ Select ALL correct answers — no partial credit</div>
+    </div>
+    <div class="options" id="qOptions"></div>
+    <div class="quiz-feedback" id="qFeedback"></div>
+    <div class="quiz-nav">
+      <span style="color:var(--muted);font-size:.85rem" id="qScoreDisp">Score: 0</span>
+      <div style="display:flex;gap:.6rem;">
+        <button class="btn btn-ghost" id="qSkipBtn" onclick="skipQuestion()">Skip →</button>
+        <button class="btn btn-ghost" id="qSubmitBtn" onclick="checkAnswer()">Check Answer</button>
+        <button class="btn btn-primary" id="qNextBtn" onclick="nextQuestion()" style="display:none">Next →</button>
+      </div>
+    </div>
+  </div>
+  <div id="quizResults" style="display:none"></div>
+</div>
+</div>
+
+<!-- ═══ CHEAT SHEET ═══ -->
+<div id="page-cheatsheet" class="page">
+<div class="container">
+  <div class="section-header"><h2>Quick Reference Cheat Sheet</h2><p>All key numbers, formulas, roles, and definitions in one place</p></div>
+  <div class="cheat-grid">
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(108,99,255,.12);color:#a89cff;">⏱ Key Timeboxes</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">PI Duration</div><div class="cheat-val">8–12 weeks (4–5 iters + 1 IP)</div></div>
+      <div class="cheat-row"><div class="cheat-key">Iteration</div><div class="cheat-val">2 weeks (standard)</div></div>
+      <div class="cheat-row"><div class="cheat-key">PI Planning</div><div class="cheat-val">2 days in-person · 3–4 days virtual</div></div>
+      <div class="cheat-row"><div class="cheat-key">Iter. Planning</div><div class="cheat-val">4 hours or less</div></div>
+      <div class="cheat-row"><div class="cheat-key">Iter. Review</div><div class="cheat-val">1–2 hours</div></div>
+      <div class="cheat-row"><div class="cheat-key">Iter. Retro</div><div class="cheat-val">30–60 minutes</div></div>
+      <div class="cheat-row"><div class="cheat-key">PO Sync</div><div class="cheat-val">30–60 min · weekly or more</div></div>
+      <div class="cheat-row"><div class="cheat-key">I&amp;A Event</div><div class="cheat-val">3–4 hours per PI</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(0,212,170,.12);color:var(--accent);">🔢 Key Numbers</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">ART size</div><div class="cheat-val">50–125 people · 5–12 teams</div></div>
+      <div class="cheat-row"><div class="cheat-key">Agile Team</div><div class="cheat-val">10 or fewer people</div></div>
+      <div class="cheat-row"><div class="cheat-key">Top Features</div><div class="cheat-val">10 socialised before PI Planning</div></div>
+      <div class="cheat-row"><div class="cheat-key">Exam</div><div class="cheat-val">45 questions · 90 minutes</div></div>
+      <div class="cheat-row"><div class="cheat-key">Passing Score</div><div class="cheat-val">80% = 36/45 correct</div></div>
+      <div class="cheat-row"><div class="cheat-key">Capacity</div><div class="cheat-val">8 pts × (devs+testers) − 1/vacation day</div></div>
+      <div class="cheat-row"><div class="cheat-key">Retake fee</div><div class="cheat-val">$50 · 1st retake immediate</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(255,107,107,.12);color:#ff8585;">👤 PO vs PM</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">PO Authority</div><div class="cheat-val">Team Backlog content authority</div></div>
+      <div class="cheat-row"><div class="cheat-key">PM Authority</div><div class="cheat-val">ART Backlog content authority</div></div>
+      <div class="cheat-row"><div class="cheat-key">PO writes</div><div class="cheat-val">Stories &amp; Story acceptance criteria</div></div>
+      <div class="cheat-row"><div class="cheat-key">PM writes</div><div class="cheat-val">Features &amp; Feature acceptance criteria</div></div>
+      <div class="cheat-row"><div class="cheat-key">PO accepts</div><div class="cheat-val">Stories &amp; team increments</div></div>
+      <div class="cheat-row"><div class="cheat-key">PM accepts</div><div class="cheat-val">System increments (System Demo)</div></div>
+      <div class="cheat-row"><div class="cheat-key">Feature size</div><div class="cheat-val">1 PI for 1 ART</div></div>
+      <div class="cheat-row"><div class="cheat-key">Story size</div><div class="cheat-val">1 Iteration for 1 team</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(255,209,102,.12);color:var(--accent4);">📐 Formulas</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">WSJF</div><div class="cheat-val">Cost of Delay ÷ Job Duration (size)</div></div>
+      <div class="cheat-row"><div class="cheat-key">Cost of Delay</div><div class="cheat-val">User-Business Value + Time Criticality + Risk Reduction/Opp. Enablement</div></div>
+      <div class="cheat-row"><div class="cheat-key">Velocity</div><div class="cheat-val">Avg story points / iteration (historical)</div></div>
+      <div class="cheat-row"><div class="cheat-key">Priority rule</div><div class="cheat-val">Higher WSJF = do first. Short job + high CoD wins.</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(56,189,248,.12);color:#7dd3fc;">📊 5 Flow Metrics</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">Distribution</div><div class="cheat-val">Amount of each work type in system</div></div>
+      <div class="cheat-row"><div class="cheat-key">Velocity</div><div class="cheat-val">Avg items completed per timeframe</div></div>
+      <div class="cheat-row"><div class="cheat-key">Time</div><div class="cheat-val">End-to-end duration per work item</div></div>
+      <div class="cheat-row"><div class="cheat-key">Load</div><div class="cheat-val">Overall WIP in the system</div></div>
+      <div class="cheat-row"><div class="cheat-key">Efficiency</div><div class="cheat-val">Value-added time vs. wait time</div></div>
+      <div class="cheat-row"><div class="cheat-key">⚠ NOT metrics</div><div class="cheat-val">Flow Budget &amp; Flow Predictability are NOT in the 5</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(108,99,255,.12);color:#a89cff;">🔤 Acronyms</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">ART</div><div class="cheat-val">Agile Release Train</div></div>
+      <div class="cheat-row"><div class="cheat-key">PI / IP</div><div class="cheat-val">Planning Interval / Innovation &amp; Planning</div></div>
+      <div class="cheat-row"><div class="cheat-key">WSJF</div><div class="cheat-val">Weighted Shortest Job First</div></div>
+      <div class="cheat-row"><div class="cheat-key">NFR</div><div class="cheat-val">Non-Functional Requirement</div></div>
+      <div class="cheat-row"><div class="cheat-key">RTE</div><div class="cheat-val">Release Train Engineer</div></div>
+      <div class="cheat-row"><div class="cheat-key">CDP</div><div class="cheat-val">Continuous Delivery Pipeline</div></div>
+      <div class="cheat-row"><div class="cheat-key">I&amp;A</div><div class="cheat-val">Inspect and Adapt</div></div>
+      <div class="cheat-row"><div class="cheat-key">ROAM</div><div class="cheat-val">Resolved · Owned · Accepted · Mitigated</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(0,212,170,.12);color:var(--accent);">✅ INVEST Criteria</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">I — Independent</div><div class="cheat-val">Can be developed separately</div></div>
+      <div class="cheat-row"><div class="cheat-key">N — Negotiable</div><div class="cheat-val">Scope can be discussed</div></div>
+      <div class="cheat-row"><div class="cheat-key">V — Valuable</div><div class="cheat-val">Delivers value to user/business</div></div>
+      <div class="cheat-row"><div class="cheat-key">E — Estimable</div><div class="cheat-val">Can be sized by the team</div></div>
+      <div class="cheat-row"><div class="cheat-key">S — Small</div><div class="cheat-val">Fits in one Iteration</div></div>
+      <div class="cheat-row"><div class="cheat-key">T — Testable</div><div class="cheat-val">Has verifiable acceptance criteria</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(255,107,107,.12);color:#ff8585;">🔄 4 SAFe Core Values</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">Alignment</div><div class="cheat-val">Connect strategy to execution</div></div>
+      <div class="cheat-row"><div class="cheat-key">Transparency</div><div class="cheat-val">Visualise work; open communication</div></div>
+      <div class="cheat-row"><div class="cheat-key">Respect for People</div><div class="cheat-val">Coach; value diversity; partnerships</div></div>
+      <div class="cheat-row"><div class="cheat-key">Relentless Improvement</div><div class="cheat-val">Problem-solving culture; facts guide</div></div>
+      <div class="cheat-row"><div class="cheat-key">Also tested</div><div class="cheat-val">Program Execution &amp; Built-in Quality are also SAFe Core Values</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(255,209,102,.12);color:var(--accent4);">🎯 SMART PI Objectives</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">S — Specific</div><div class="cheat-val">Action verb; clear intended outcome</div></div>
+      <div class="cheat-row"><div class="cheat-key">M — Measurable</div><div class="cheat-val">Yes/No, quantitative, or a range</div></div>
+      <div class="cheat-row"><div class="cheat-key">A — Achievable</div><div class="cheat-val">Within team's control</div></div>
+      <div class="cheat-row"><div class="cheat-key">R — Realistic</div><div class="cheat-val">Recognises uncontrollable factors</div></div>
+      <div class="cheat-row"><div class="cheat-key">T — Time-bound</div><div class="cheat-val">Accomplishable within the PI</div></div>
+      <div class="cheat-row"><div class="cheat-key">Uncommitted</div><div class="cheat-val">Planned + in load + low confidence = improves predictability</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(56,189,248,.12);color:#7dd3fc;">📅 I&amp;A 3 Parts + Problem Solving</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">Part 1</div><div class="cheat-val">PI System Demo</div></div>
+      <div class="cheat-row"><div class="cheat-key">Part 2</div><div class="cheat-val">Quantitative &amp; Qualitative Measurement</div></div>
+      <div class="cheat-row"><div class="cheat-key">Part 3</div><div class="cheat-val">Retrospective &amp; Problem-Solving Workshop</div></div>
+      <div class="cheat-row"><div class="cheat-key">Problem Solving</div><div class="cheat-val">Pareto → 5 Whys → Brainstorm → Improvement Backlog</div></div>
+      <div class="cheat-row"><div class="cheat-key">⚠ Anti-pattern</div><div class="cheat-val">POs presenting ALL work (teams should demo their own)</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(108,99,255,.12);color:#a89cff;">🗂 Design Thinking Tools</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">Personas</div><div class="cheat-val">Characterisations of users to guide design</div></div>
+      <div class="cheat-row"><div class="cheat-key">Customer Journey Maps</div><div class="cheat-val">End-to-end experience visualisation</div></div>
+      <div class="cheat-row"><div class="cheat-key">Story Maps</div><div class="cheat-val">User workflow + supporting Stories</div></div>
+      <div class="cheat-row"><div class="cheat-key">Whole-Product Thinking</div><div class="cheat-val">Generic → Expected → Augmented → Potential</div></div>
+    </div></div>
+    <div class="cheat-card"><div class="cheat-head" style="background:rgba(0,212,170,.12);color:var(--accent);">🚆 CDP 4 Stages</div><div class="cheat-body">
+      <div class="cheat-row"><div class="cheat-key">CE</div><div class="cheat-val">Continuous Exploration — hypothesize, architect, synthesize</div></div>
+      <div class="cheat-row"><div class="cheat-key">CI</div><div class="cheat-val">Continuous Integration — develop, build, test end-to-end</div></div>
+      <div class="cheat-row"><div class="cheat-key">CD</div><div class="cheat-val">Continuous Deployment — deploy, verify, monitor, respond</div></div>
+      <div class="cheat-row"><div class="cheat-key">RoD</div><div class="cheat-val">Release on Demand — release, measure, learn, stabilise</div></div>
+    </div></div>
+  </div>
+</div>
+</div>
+
+<!-- ═══ TIPS ═══ -->
+<div id="page-tips" class="page">
+<div class="container">
+  <div class="section-header"><h2>Exam Strategy &amp; Tips</h2><p>Sourced from SAFe workbook + candidates who passed first attempt</p></div>
+  <div class="tips-grid">
+    <div class="tip-card t1"><div class="tip-num">01</div><div class="tip-title">Focus on High-Weight Domains First</div><div class="tip-text">D1 (Iteration Execution, 30–32%) + D2 (PI Planning Prep, 21–24%) = over half the exam. Budget ~60% of study time on these two before the others.</div></div>
+    <div class="tip-card t2"><div class="tip-num">02</div><div class="tip-title">Know PO vs PM Differences Cold</div><div class="tip-text">PO = Team Backlog; PM = ART Backlog. PO accepts Stories; PM accepts System increments. PM creates Vision; POs contribute. This is the #1 most tested distinction.</div></div>
+    <div class="tip-card t3"><div class="tip-num">03</div><div class="tip-title">Think SAFe Mindset, Not Common Sense</div><div class="tip-text">Scenario questions have SAFe "right" answers that differ from instinct. Always ask "What would the Lean-Agile framework prescribe?" Customer-centric, decentralised decisions usually win.</div></div>
+    <div class="tip-card t4"><div class="tip-num">04</div><div class="tip-title">Aim 90%+ on Practice Tests</div><div class="tip-text">The real exam needs 80%. Consistently scoring 90%+ in practice buffers against unfamiliar phrasing and tricky multi-select questions on exam day.</div></div>
+    <div class="tip-card t1"><div class="tip-num">05</div><div class="tip-title">First Step of Iteration Planning = Establish Capacity</div><div class="tip-text">A direct exam question. "What is the FIRST step?" = Establish Capacity. Not story analysis, not goal-setting. This is explicitly stated in the SAFe workbook agenda.</div></div>
+    <div class="tip-card t2"><div class="tip-num">06</div><div class="tip-title">WSJF Is Always Tested</div><div class="tip-text">WSJF = CoD ÷ Job Size. Three CoD components: User-Business Value + Time Criticality + Risk Reduction/Opportunity Enablement. Know how to rank items from a WSJF table.</div></div>
+    <div class="tip-card t3"><div class="tip-num">07</div><div class="tip-title">Multi-Select = ALL Correct Required</div><div class="tip-text">No partial credit on multi-select. "Choose two" = exactly two. Eliminate clearly wrong options first, then pick carefully. The exam never gives partial credit for partially right answers.</div></div>
+    <div class="tip-card t4"><div class="tip-num">08</div><div class="tip-title">Take Exam Within 7 Days of Training</div><div class="tip-text">Material is freshest right after the course. Your free attempt is valid for 30 days after course completion. Don't wait — schedule within a week for best retention.</div></div>
+    <div class="tip-card t1"><div class="tip-num">09</div><div class="tip-title">Uncommitted Objectives Are a Trap</div><div class="tip-text">They ARE planned. They DO count toward capacity. They exist to improve predictability by flagging low-confidence items. They are NOT optional extras or "nice to haves."</div></div>
+    <div class="tip-card t2"><div class="tip-num">10</div><div class="tip-title">Know All 4 SAFe Core Values</div><div class="tip-text">Alignment, Transparency, Respect for People, Relentless Improvement. PLUS Program Execution and Built-in Quality are also Core Values. DevOps and Innovation are NOT Core Values.</div></div>
+    <div class="tip-card t3"><div class="tip-num">11</div><div class="tip-title">Vision Input = Customer Feedback</div><div class="tip-text">"What is one input to the Vision?" = Customer feedback. Not Portfolio Backlog, not Team topologies, not Feature context. Customer feedback drives Vision evolution.</div></div>
+    <div class="tip-card t4"><div class="tip-num">12</div><div class="tip-title">System Demo Anti-patterns</div><div class="tip-text">Do NOT use test data (use staging). Team demos do NOT replace System Demos. POs should NOT present ALL work. The System Demo integrates ALL teams' features together.</div></div>
+    <div class="tip-card t1"><div class="tip-num">13</div><div class="tip-title">Business Owners' Role at PI Planning</div><div class="tip-text">Business Owners assign Business Value (BV) scores to PI Objectives. Their primary responsibility is "aligning priorities and PI Planning." They are key ART stakeholders.</div></div>
+    <div class="tip-card t2"><div class="tip-num">14</div><div class="tip-title">Built-in Quality = Agile Teams (Not Testers)</div><div class="tip-text">"Who ensures quality is built into code?" = Agile Teams collectively. NOT just Testers, NOT just Developers, NOT the PO alone. Built-in Quality is a shared team practice.</div></div>
+    <div class="tip-card t3"><div class="tip-num">15</div><div class="tip-title">Confidence Vote Comes After ROAM</div><div class="tip-text">PI Planning Day 2 sequence: Planning Adjustments → Team Breakouts → Final Plan Review → ART PI Risks (ROAM) → Confidence Vote → Plan Rework → Retrospective. Memorise this order.</div></div>
+    <div class="tip-card t4"><div class="tip-num">16</div><div class="tip-title">PM Develops Preliminary Iteration Goals When?</div><div class="tip-text">PRIOR to Iteration Planning — not during, not in backlog refinement. POs develop these based on team's PI commitments and progress made so far in the PI.</div></div>
+  </div>
+</div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+//  FLASHCARD DATA (55 cards)
+// ═══════════════════════════════════════════════
+const flashcards=[
+{domain:'D1',tag:'Iteration Execution',q:'What are the 5 key PO responsibilities?',a:'1) Connecting with Customer\n2) Contributing to Vision & Roadmap\n3) Managing & Prioritizing Team Backlog\n4) Supporting Team in Delivering Value\n5) Getting & Applying Feedback',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'What is the INVEST acronym for good User Stories?',a:'I — Independent (can be built separately)\nN — Negotiable (scope can be discussed)\nV — Valuable (delivers user/business value)\nE — Estimable (can be sized)\nS — Small (fits one Iteration)\nT — Testable (has acceptance criteria)',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'User Story "user voice" format?',a:'"As a (user role), I want (activity) so that (business value)"\n\nKeeps stories customer-centric and outcome-focused.',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'What does Given-When-Then represent?',a:'Given = initial conditions/context\nWhen = action performed\nThen = expected testable result',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'How do you establish team capacity with no history?',a:'8 story points × (devs + testers)\nSubtract 1 pt per vacation/holiday day\nExclude PO and SM/TC',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'3 purposes of Iteration Goals?',a:'1) Provide transparency & management information\n2) Align team members to a common purpose\n3) Align teams to PI Objectives & manage dependencies',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'Timebox for Iteration Planning? First step?',a:'4 hours or less\n\nFirst step: Establish Capacity\n(before story analysis or goal-setting)',src:'SAFe Workbook + Docsity 2025'},
+{domain:'D1',tag:'Iteration Execution',q:'4 options when a Story is incomplete at Iteration end?',a:'Split it → Continue it → Delay it → Abandon it\n\nNever mark incomplete as done.',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'What are the 3 Cs of User Stories?',a:'Card — written briefly on a card\nConversation — details via PO discussion\nConfirmation — acceptance criteria confirm correctness',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'PO\'s role in Team Sync (Daily Stand-up)?',a:'Attend as team member · Listen for impediments · Clarify Story intent/AC · Watch for opportunities to release value · Do NOT take over from SM/TC',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'What is the purpose of the Iteration Retrospective?',a:'Pick 1–2 improvements per iteration (timebox: 30–60 min)\nOutputs become improvement items in Team Backlog\nReviews quantitative + qualitative feedback',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'What is the purpose of Story Maps?',a:'A Design Thinking tool capturing user workflow and the Stories that support it.\nHelps design end-to-end experiences and validate Story coverage.',src:'SAFe Workbook 6.0'},
+{domain:'D1',tag:'Iteration Execution',q:'When is a Story considered complete (Definition of Done)?',a:'1. Satisfies acceptance criteria\n2. Accepted by the Product Owner\n\nBoth conditions must be met.',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'What is PI Planning\'s primary purpose?',a:'A cadence-based event that aligns all ART teams to a shared mission and Vision.\n\nDuration: 2 days in-person · 3–4 days virtual\nHeartbeat of the ART.',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'How long is a typical PI?',a:'8–12 weeks\nConsists of 4–5 development Iterations + 1 IP Iteration.',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'WSJF formula and 3 CoD components?',a:'WSJF = Cost of Delay ÷ Job Duration (size)\n\nCoD = User-Business Value\n     + Time Criticality\n     + Risk Reduction / Opp. Enablement',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'What is the SAFe Backlog hierarchy?',a:'Portfolio Backlog → ART Backlog → Team Backlog\nEpics → Features → Stories\n\nFeatures live in ART Backlog. Stories in Team Backlog.',src:'Docsity 2025 Exam Q&A'},
+{domain:'D2',tag:'PI Planning Prep',q:'What are the SAFe Core Values?',a:'Alignment · Transparency\nRespect for People · Relentless Improvement\n\nAlso tested: Program Execution, Built-in Quality',src:'Stuvia/Docsity 2025'},
+{domain:'D2',tag:'PI Planning Prep',q:'What is a Solution Vision?',a:'Description of the future state of the product/Solution.\nAspirational yet realistic · "Postcard from the future"\nAnswers: What problem? For whom? What NFRs?',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'What is one input to the Vision?',a:'Customer feedback\n\nThe Vision evolves from continuous customer feedback and market signals.',src:'PassQuestion.com'},
+{domain:'D2',tag:'PI Planning Prep',q:'Who ensures ART has Vision & Backlog for PI Planning?',a:'Product Management\n\n(Not the RTE, PO, or Lean-Agile CoE)',src:'PassQuestion.com'},
+{domain:'D2',tag:'PI Planning Prep',q:'3 Design Thinking tools for creating Features?',a:'1) Personas\n2) Customer Journey Maps\n3) Story Maps\n\n(Whole-Product Thinking is also used)',src:'PassQuestion.com + SAFe Workbook'},
+{domain:'D2',tag:'PI Planning Prep',q:'What is capacity allocation and why is it important?',a:'Balancing new Feature development with Architectural Runway, technical debt, and maintenance.\n\nEstablishes percentage policies per work type per PI.',src:'SAFe Workbook 6.0'},
+{domain:'D2',tag:'PI Planning Prep',q:'Features in the ART Backlog can result from what?',a:'Splitting Epics or Capabilities\n\n(Not from aggregating Stories or decomposing Enabler Stories)',src:'Stuvia 2025'},
+{domain:'D3',tag:'PO/PM Roles',q:'PO vs PM content authority?',a:'PO = Team Backlog content authority\nPM = ART Backlog content authority\n\nMost frequently tested distinction in POPM exam.',src:'SAFe Workbook 6.0'},
+{domain:'D3',tag:'PO/PM Roles',q:'Who has authority to accept Stories?',a:'The Product Owner has authority for accepting Stories and team increments.',src:'SAFe Workbook 6.0'},
+{domain:'D3',tag:'PO/PM Roles',q:'4 aspects of "Connecting with the Customer" for PO?',a:'1) Know the Customer\n2) Know the stakeholders\n3) Identify the problem to be solved\n4) Develop whole-product Solutions',src:'SAFe Workbook 6.0'},
+{domain:'D3',tag:'PO/PM Roles',q:'PM\'s 5 areas of responsibility?',a:'1) Connecting with Customer\n2) Delivering Value\n3) Exploring Markets & Users\n4) Managing & Prioritizing ART Backlog\n5) Defining Product Strategy, Vision & Roadmaps',src:'SAFe Workbook 6.0'},
+{domain:'D3',tag:'PO/PM Roles',q:'How does PM "Connect with the Customer"?',a:'Gemba walks · Customer site visits · Post-release feedback · Elicitation discussions\n\nNOT: input from product governance committee',src:'PassQuestion.com'},
+{domain:'D3',tag:'PO/PM Roles',q:'Scrum Master / Team Coach is above all else…?',a:'A servant leader\n\nFacilitates PI Planning, supports Iteration execution, improves flow, builds high-performing teams.',src:'Docsity 2025'},
+{domain:'D3',tag:'PO/PM Roles',q:'Who is responsible for Built-in Quality?',a:'Agile Teams (collectively)\n\nNot just Testers, not just Developers, not the PO. It is a shared team responsibility.',src:'PassQuestion.com'},
+{domain:'D3',tag:'PO/PM Roles',q:'What does transparency mean in SAFe?',a:'The process and work are visible to all stakeholders.\n\n(SAFe Core Value)',src:'PassQuestion.com'},
+{domain:'D4',tag:'Leading PI Planning',q:'SMART PI Objectives?',a:'S — Specific (action verb)\nM — Measurable (Yes/No or quantitative)\nA — Achievable (within team control)\nR — Realistic (recognises uncontrollable factors)\nT — Time-bound (within the PI)',src:'SAFe Workbook 6.0'},
+{domain:'D4',tag:'Leading PI Planning',q:'Purpose of uncommitted objectives?',a:'Improve predictability when confidence is low.\nThey ARE planned. They DO count toward capacity/load.\nThey are NOT optional extras.',src:'SAFe Workbook 6.0'},
+{domain:'D4',tag:'Leading PI Planning',q:'4 dependency management strategies?',a:'1) Distribute work (bottlenecks)\n2) Adjust sequencing (same-iteration deps)\n3) Adjust between teams (capacity imbalance)\n4) Split Features/Stories (complex critical path)',src:'SAFe Workbook 6.0'},
+{domain:'D4',tag:'Leading PI Planning',q:'What does ROAM stand for?',a:'R — Resolved (no longer a concern)\nO — Owned (someone took responsibility)\nA — Accepted (nothing more can be done)\nM — Mitigated (team has a plan)',src:'SAFe Workbook 6.0'},
+{domain:'D4',tag:'Leading PI Planning',q:'After ROAM, what comes next in PI Planning?',a:'Confidence Vote\n\nFist-of-five (1–5). Low votes trigger plan rework before commitment.',src:'Docsity 2025'},
+{domain:'D4',tag:'Leading PI Planning',q:'Communicating Vision in PI Planning supports which Core Value?',a:'Alignment\n\nRefinement and communication of Vision aligns teams to a common mission and strategy.',src:'PassQuestion.com'},
+{domain:'D4',tag:'Leading PI Planning',q:'2 main purposes of PI Objectives?',a:'1) Decentralised decision-making is easier once business value is clear\n2) Immediate feedback to business owners that teams understand desired outcomes',src:'PassQuestion.com'},
+{domain:'D4',tag:'Leading PI Planning',q:'When should PO develop preliminary Iteration Goals?',a:'PRIOR to Iteration Planning\n\n(Not during PI Planning, not in backlog refinement, not during Iteration Planning itself)',src:'PassQuestion.com'},
+{domain:'D5',tag:'PI Execution',q:'3 parts of Inspect and Adapt?',a:'1) PI System Demo\n2) Quantitative & Qualitative Measurement\n3) Retrospective & Problem-Solving Workshop\n\nTimebox: 3–4 hours per PI',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'Purpose of the PO Sync?',a:'Visibility into ART progress toward PI Objectives.\nOpportunity to assess scope adjustments.\nFacilitated by RTE or Product Management.\nWeekly or more frequently.',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'5 Flow Metrics (exact exam answer)?',a:'1. Flow Distribution\n2. Flow Velocity\n3. Flow Time\n4. Flow Load\n5. Flow Efficiency\n\n⚠ "Flow Budget" is NOT one of the 5.',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'System Demo key rules?',a:'• Functionally complete Features (or toggled)\n• AFTER Iteration Review (max 1 iter lag)\n• Staging environment (NOT test data)\n• Showcases Customer value',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'What is the IP Iteration for?',a:'Innovation (hackathons, spikes)\nPI Planning (occurs here)\nEstimating guard band\nInspect & Adapt\nSkills development\n\nNOT just a catch-up iteration.',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'I&A anti-pattern?',a:'Product Owners presenting ALL work in the PI System Demo.\n\nTeams should demo their own work.',src:'Docsity 2025'},
+{domain:'D5',tag:'PI Execution',q:'System Demo anti-pattern?',a:'Accepting team-level demos as a substitute for the System Demo.\n\nAlso: using test data · POs seeing things for first time · not inviting team members',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'4 stages of the Continuous Delivery Pipeline?',a:'1) CE — Continuous Exploration\n2) CI — Continuous Integration\n3) CD — Continuous Deployment\n4) RoD — Release on Demand',src:'SAFe Workbook 6.0'},
+{domain:'D5',tag:'PI Execution',q:'Primary responsibility of Business Owners in SAFe?',a:'Aligning priorities and PI Planning\n\nThey assign Business Value (BV) scores to PI Objectives.',src:'Docsity 2025'},
+{domain:'D5',tag:'PI Execution',q:'What is one benefit of constant customer feedback?',a:'Fast learning cycles\n\nEnables continuous product improvement — core Lean-Agile principle.',src:'Stuvia 2025'},
+{domain:'D5',tag:'PI Execution',q:'What SAFe Core Competency covers Lean strategy and investment funding?',a:'Lean Portfolio Management (LPM)\n\nApplies Lean and systems thinking to strategy, investment, and governance.',src:'Docsity 2025'},
+{domain:'D5',tag:'PI Execution',q:'What statement accurately describes the SAFe Backlog Model?',a:'Features are in the ART Backlog\nStories are in the Team Backlog\nEpics are in the Portfolio Backlog',src:'Docsity 2025'},
+{domain:'D5',tag:'PI Execution',q:'What describes the Scaled Agile Framework?',a:'It synchronises alignment, collaboration, and delivery for large numbers of Agile teams.\n\nNot just scaled Scrum. Not prescriptive about all daily activities.',src:'Stuvia 2025'},
+{domain:'D5',tag:'PI Execution',q:'What is the recommended frequency for Iteration Planning?',a:'Every Iteration (every two weeks)\n\nIt is a cadence-based event, not ad-hoc.',src:'Docsity 2025'},
+];
+
+// ═══════════════════════════════════════════════
+//  QUIZ DATA (90 questions)
+// ═══════════════════════════════════════════════
+const quizData=[
+// D1 — 24 questions
+{domain:'D1',ms:true,q:'What are the key responsibilities of a Product Owner during Iteration execution?',opts:['Writing code for user stories','Managing and prioritizing the Team Backlog','Supporting the team in delivering value','Getting and applying feedback','Facilitating daily stand-ups'],correct:[1,2,3],explanation:'PO core responsibilities: manage Team Backlog, support delivery, get/apply feedback. POs do NOT write code. Stand-up facilitation is the SM/TC role.'},
+{domain:'D1',ms:false,q:'What is the recommended format for writing User Stories?',opts:['As a developer, I want to implement feature X','As a (user role), I want (activity) so that (business value)','Feature X should be implemented using technology Y','The system shall provide functionality Z'],correct:[1],explanation:'The "user voice" format captures role, activity, and business goal — keeping stories customer-centric.'},
+{domain:'D1',ms:true,q:'Which are characteristics of a good User Story using INVEST criteria?',opts:['Independent','Negotiable','Valuable','Inflexible','Small','Testable'],correct:[0,1,2,4,5],explanation:'INVEST = Independent, Negotiable, Valuable, Estimable, Small, Testable. "Inflexible" is the opposite of Negotiable.'},
+{domain:'D1',ms:false,q:'What is the primary purpose of acceptance criteria in User Stories?',opts:['To provide technical implementation details','To define the testing perspective and confirm story correctness','To estimate the story size','To assign the story to a specific developer'],correct:[1],explanation:'Acceptance criteria confirm story correctness from a testing viewpoint — the "Confirmation" in the 3Cs.'},
+{domain:'D1',ms:false,q:'What is the recommended timebox for Iteration Planning?',opts:['2 hours or less','4 hours or less','6 hours or less','8 hours or less'],correct:[1],explanation:'Iteration Planning is timeboxed to 4 hours or less.'},
+{domain:'D1',ms:false,q:'According to SAFe, what is the recommended FIRST step of Iteration Planning?',opts:['Story analysis and estimating','Developing Iteration Goals','Establishing capacity','Committing to Iteration Goals'],correct:[2],explanation:'Establishing Capacity is the first step. Teams must know how much work they can take on before selecting Stories.'},
+{domain:'D1',ms:false,q:'In "Given-When-Then" acceptance criteria, what does "Given" represent?',opts:['The expected result','The action performed','The initial conditions or context','The test data used'],correct:[2],explanation:'Given = initial context/preconditions. When = action. Then = expected testable outcome.'},
+{domain:'D1',ms:true,q:'What are the main purposes of Iteration Goals?',opts:['Provide transparency and management information','Align team members to a common purpose','Replace the need for User Stories','Align teams to PI Objectives and manage dependencies'],correct:[0,1,3],explanation:'3 purposes: transparency, team alignment, and alignment to PI Objectives/dependencies.'},
+{domain:'D1',ms:false,q:'How is team capacity established when there is no historical velocity?',opts:['Use 10 points per team member','Give 8 points for every full-time developer and tester; subtract for vacation','Use the previous team\'s velocity','Estimate based on story complexity only'],correct:[1],explanation:'8 points × (devs + testers), minus 1 point per vacation/holiday day. Exclude PO and SM/TC.'},
+{domain:'D1',ms:false,q:'What is the primary benefit of using Story points for estimation?',opts:['They provide exact time estimates','They enable relative sizing and comparison between stories','They are required by SAFe','They replace velocity tracking'],correct:[1],explanation:'Story points are relative — not tied to time — allowing quick comparison of Story sizes.'},
+{domain:'D1',ms:false,q:'What is the purpose of the Team Kanban board?',opts:['To track individual developer productivity','To promote collaboration and facilitate flow','To replace Iteration Planning','To manage the ART Backlog'],correct:[1],explanation:'The Team Kanban promotes collaboration and facilitates flow of work through the team\'s value stream.'},
+{domain:'D1',ms:true,q:'Which events should Product Owners actively participate in during Iteration execution?',opts:['Team Sync','Iteration Review','Iteration Retrospective','Backlog Refinement','Code reviews'],correct:[0,1,2,3],explanation:'POs participate in: Team Sync, Iteration Review, Retrospective, and Backlog Refinement. Code reviews are a developer activity.'},
+{domain:'D1',ms:false,q:'What is one responsibility of the Product Owner during Team Sync?',opts:['To assign tasks to team members','To clarify story intent and acceptance criteria','To facilitate the meeting','To report status to management'],correct:[1],explanation:'POs clarify Story intent and acceptance criteria during Team Sync. SM/TC facilitates the meeting.'},
+{domain:'D1',ms:false,q:'What is one outcome of the Iteration Retrospective?',opts:['Improvement items in the Team Backlog','Agreement on Stories for the next Iteration','Identification of dependencies with other teams','A plan for upcoming milestones'],correct:[0],explanation:'Retrospective produces improvement backlog items (1–2 per iteration) added to the Team Backlog.'},
+{domain:'D1',ms:false,q:'What does the Product Owner do during backlog refinement?',opts:['Writes technical specifications','Ensures Stories are ready and provides clarification','Assigns Stories to specific developers','Sets up the development environment'],correct:[1],explanation:'PO ensures Stories are ready for upcoming iterations — adding detail, acceptance criteria, and clarifying intent.'},
+{domain:'D1',ms:false,q:'When a Story is not completed in an Iteration, which option is NOT valid?',opts:['Split it into smaller pieces','Mark it as done anyway','Continue it in the next Iteration','Abandon it if no longer valuable'],correct:[1],explanation:'"Mark it as done anyway" violates transparency. Valid options: Split it, Continue it, Delay it, Abandon it.'},
+{domain:'D1',ms:false,q:'What is the purpose of Story Maps?',opts:['Track individual developer work','Capture user workflow and the Stories that support it','Replace the ART Backlog','Define PI Objectives'],correct:[1],explanation:'Story Maps are a Design Thinking tool capturing user workflow and validating Story coverage.'},
+{domain:'D1',ms:false,q:'A Story is considered complete when it satisfies which conditions?',opts:['Satisfies acceptance criteria AND is accepted by the PO','Is deployed to production AND accepted by the RTE','Passes automated tests AND is merged to main branch','Is demonstrated in Iteration Review AND approved by Business Owners'],correct:[0],explanation:'Done = satisfies acceptance criteria + accepted by Product Owner. Both conditions required.'},
+{domain:'D1',ms:false,q:'What is the main purpose of the Iteration Review?',opts:['Plan the next iteration stories','Demonstrate working software and gather feedback from stakeholders','Identify process improvements','Assign business value to PI Objectives'],correct:[1],explanation:'The Iteration Review demonstrates working software (the true measure of progress) and gathers stakeholder feedback.'},
+{domain:'D1',ms:false,q:'How long is a typical Iteration?',opts:['1 week','2 weeks','4 weeks','8 weeks'],correct:[1],explanation:'A typical Iteration is 2 weeks. Iterations are the basic building blocks of Agile development in SAFe.'},
+{domain:'D1',ms:true,q:'What are appropriate activities for the PO during the Iteration Review?',opts:['Review business context and Iteration Goals','Accept or reject each Story','Demo every Story personally','Discuss Stories not completed','Revise Team Backlog as needed'],correct:[0,1,3,4],explanation:'PO reviews goals, accepts/rejects Stories, discusses incomplete work, and revises the backlog. The PO does NOT demo every Story — team members demo their own work.'},
+{domain:'D1',ms:false,q:'What is one method to establish a team\'s velocity in SAFe?',opts:['Use 8 points per team member','Compare average Story points completed throughout previous iterations','Ask the business owner for a target','Use the team\'s original PI Planning estimate'],correct:[1],explanation:'Velocity = average Story points completed across previous iterations (historical data).'},
+{domain:'D1',ms:false,q:'During Iteration Planning, who has the authority to prioritize the Team Backlog?',opts:['Scrum Master','Product Owner','Development Team','Business Owner'],correct:[1],explanation:'The Product Owner has Team Backlog content authority and prioritises it.'},
+{domain:'D1',ms:false,q:'What is the purpose of estimating poker in SAFe?',opts:['Allows managers to control estimates','Combines expert opinion, analogy, and disaggregation for reliable estimates','Forces consensus by majority vote','Replaces the need for Story points'],correct:[1],explanation:'Estimating poker combines expert opinion, analogy, and disaggregation. All members participate, increasing accuracy and creating shared understanding.'},
+// D2 — 18 questions
+{domain:'D2',ms:false,q:'What is PI Planning\'s primary purpose in SAFe?',opts:['Plan individual developer tasks','A cadence-based event that aligns all ART teams to a shared mission and Vision','Review completed work from previous PI','Conduct performance reviews'],correct:[1],explanation:'PI Planning is the heartbeat of the ART — aligning all teams to a shared mission and Vision on a cadence.'},
+{domain:'D2',ms:false,q:'How long is a typical Planning Interval (PI)?',opts:['4–6 weeks','6–8 weeks','8–12 weeks','12–16 weeks'],correct:[2],explanation:'A PI is typically 8–12 weeks: 4–5 development iterations + 1 IP Iteration.'},
+{domain:'D2',ms:true,q:'What should Product Management prepare before PI Planning?',opts:['Updated Vision and Roadmaps','Top 10 Features socialized to teams','Individual developer assignments','Business context and priorities'],correct:[0,1,3],explanation:'PM prepares Vision, Roadmaps, socialises top 10 Features, and provides business context. Individual developer assignments are not PM\'s responsibility.'},
+{domain:'D2',ms:false,q:'What is WSJF?',opts:['Weighted Shortest Job First – prioritisation based on cost of delay and job size','Work Sequence Job Framework – a planning methodology','Weekly Status Job Function – a reporting mechanism','Written Specification Job Format – a documentation standard'],correct:[0],explanation:'WSJF = Cost of Delay ÷ Job Duration. It optimises economic outcomes by sequencing highest-value work first.'},
+{domain:'D2',ms:true,q:'What are the three components of Cost of Delay?',opts:['User-business value','Development complexity','Time criticality','Technical debt','Risk reduction and opportunity enablement'],correct:[0,2,4],explanation:'CoD = User-Business Value + Time Criticality + Risk Reduction/Opp. Enablement. Complexity and technical debt are NOT CoD components.'},
+{domain:'D2',ms:false,q:'How should Features be sized in SAFe?',opts:['To fit within one PI for one ART','To take exactly one Iteration','To require multiple ARTs','To span multiple PIs'],correct:[0],explanation:'Features are sized to fit within one PI for one ART. Stories fit within one Iteration for one team.'},
+{domain:'D2',ms:false,q:'What is the relationship between Epics, Features, and Stories?',opts:['Stories contain Features which contain Epics','Epics contain Features which contain Stories','They are independent artifacts','Features and Stories are the same thing'],correct:[1],explanation:'Hierarchy: Epics (Portfolio) → Features (ART Backlog) → Stories (Team Backlog).'},
+{domain:'D2',ms:false,q:'What is capacity allocation?',opts:['Assigning team members to specific Features','Balancing functionality with Architectural Runway and technical work','Allocating budget across teams','Determining team size per iteration'],correct:[1],explanation:'Capacity allocation balances new Features vs. Enablers, technical debt, and maintenance.'},
+{domain:'D2',ms:false,q:'What is one input to the Vision?',opts:['Customer feedback','Team topologies','Feature context','Portfolio Backlog'],correct:[0],explanation:'Customer feedback is the key input to the Vision — it drives Vision evolution continuously.'},
+{domain:'D2',ms:false,q:'Which function ensures the ART has the Vision and Backlog for PI Planning?',opts:['Lean-Agile Center of Excellence','Release Train Engineer','Product Management','Product Owner'],correct:[2],explanation:'Product Management owns Vision, ART Backlog, and Roadmaps — all must be ready before PI Planning.'},
+{domain:'D2',ms:true,q:'What are the three Design Thinking tools PMs and POs use to create Features?',opts:['Story Maps','Whole-Product Thinking','Personas','Customer Journey Maps','Lean Business Case'],correct:[0,2,3],explanation:'3 Design Thinking tools: Story Maps, Personas, Customer Journey Maps.'},
+{domain:'D2',ms:false,q:'Features in the ART Backlog can result from what?',opts:['Decomposing Enabler Stories','Splitting Epics or Capabilities','Aggregating Stories into Features','Refining the Team Backlog'],correct:[1],explanation:'Features come from splitting Epics or Capabilities — not from aggregating Stories.'},
+{domain:'D2',ms:true,q:'What are well-written Feature characteristics?',opts:['Include a benefit hypothesis','Have acceptance criteria','Are sized to fit in one PI for one ART','Include detailed technical implementation','Focus on customer or business value'],correct:[0,1,2,4],explanation:'Good Features: benefit hypothesis, acceptance criteria, PI-sized, customer-focused. Detailed technical implementation belongs in Enablers.'},
+{domain:'D2',ms:false,q:'What is the Solution Roadmap?',opts:['A day-by-day plan for each Iteration','A multi-year view showing milestones, Epics, and Capabilities','A sprint backlog for the upcoming PI','Individual team velocity forecasts'],correct:[1],explanation:'The Solution Roadmap provides a multi-year view. The PI Roadmap is shorter-term with higher fidelity.'},
+{domain:'D2',ms:false,q:'What influences Solution and PI Roadmaps?',opts:['Individual team velocity only','Market rhythms and market events','Developer preferences','Technical debt levels'],correct:[1],explanation:'Market rhythms (cyclical, predictable patterns like retail seasons) and market events (ad-hoc changes like competitor releases) both influence Roadmap timing.'},
+{domain:'D2',ms:false,q:'What is the purpose of a PI Roadmap?',opts:['Multi-year capability planning','Shorter-term planning with more fidelity than Solution Roadmap; shows committed and forecast items','Day-by-day iteration task breakdown','Budget allocation for the quarter'],correct:[1],explanation:'PI Roadmap shows committed objectives (PI 1) and forecasted items (PI 2–3) with more detail than the long-range Solution Roadmap.'},
+{domain:'D2',ms:false,q:'What does the ART Kanban represent?',opts:['Team-level work in progress','The flow of Features through the Continuous Delivery Pipeline from Funnel to Release','Individual developer task boards','PI Planning agenda items'],correct:[1],explanation:'ART Kanban visualises Feature flow through the CDP stages: Funnel → Analyzing → Ready → Implementing → Validating → Deploying → Releasing.'},
+{domain:'D2',ms:false,q:'What is a Benefit Hypothesis in a Feature?',opts:['A technical specification','A statement of measurable value the Feature is expected to deliver','An estimate of development cost','A list of acceptance tests'],correct:[1],explanation:'The Benefit Hypothesis describes the expected measurable value the Feature will deliver to users or the business. It is tested after delivery.'},
+// D3 — 15 questions
+{domain:'D3',ms:true,q:'What are the five key areas of responsibility for a Product Owner?',opts:['Connecting with the Customer','Writing code','Contributing to Vision and Roadmap','Managing and prioritizing the Team Backlog','Supporting the team in delivering value','Getting and applying feedback'],correct:[0,2,3,4,5],explanation:'5 PO responsibilities. POs do NOT write code.'},
+{domain:'D3',ms:false,q:'What is the difference between PM and PO content authority?',opts:['They have the same authority','PM has ART Backlog authority; PO has Team Backlog authority','PO has ART Backlog authority; PM has Team Backlog authority','Both share all authority equally'],correct:[1],explanation:'PM = ART Backlog. PO = Team Backlog. Most tested role distinction in POPM.'},
+{domain:'D3',ms:true,q:'What does "Connecting with the Customer" involve for Product Owners?',opts:['Know the Customer','Know the stakeholders','Identify the problem to be solved','Develop whole-product Solutions','Write technical documentation'],correct:[0,1,2,3],explanation:'4 aspects: Know Customer, Know stakeholders, Identify problem, Develop whole-product Solutions.'},
+{domain:'D3',ms:false,q:'What is the PO\'s role in Story acceptance?',opts:['Stories are automatically accepted when developed','The PO has authority for accepting Stories and team increments','Only the Scrum Master can accept Stories','Business Owners must accept all Stories'],correct:[1],explanation:'PO has full authority to accept or reject Stories and team increments.'},
+{domain:'D3',ms:true,q:'What are the key aspects of Supporting the Team in Value Delivery?',opts:['Balance stakeholder perspectives','Elaborate Stories with the team','Foster Built-in Quality','Write all code personally','Participate in team and ART events'],correct:[0,1,2,4],explanation:'Support delivery: balance perspectives, elaborate Stories, foster quality, participate in events. POs do NOT write code.'},
+{domain:'D3',ms:false,q:'What is one responsibility of Product Management?',opts:['Managing and prioritizing the Team Backlog','Supporting the team in delivering value','Connecting with the Customer','Building the Solution'],correct:[2],explanation:'"Connecting with the Customer" is a PM-level responsibility — through Gemba walks, customer visits, etc.'},
+{domain:'D3',ms:false,q:'Who is the Scrum Master / Team Coach above all else?',opts:['An event facilitator','The iteration owner','A servant leader','A process enforcer'],correct:[2],explanation:'SM/TC is above all else a servant leader — supporting the team, removing impediments, building high-performing teams.'},
+{domain:'D3',ms:false,q:'What does transparency mean in a SAFe context?',opts:['The process is visible to all stakeholders','Team members must immediately share all feedback','Dev and Ops teams work together','The team constantly improves its process'],correct:[0],explanation:'Transparency = work and process visible to all stakeholders. It is one of the 4 SAFe Core Values.'},
+{domain:'D3',ms:false,q:'Who is responsible for ensuring quality is built into code in SAFe?',opts:['Agile Teams','Developers only','Testers only','Product Owners'],correct:[0],explanation:'Built-in Quality is a shared responsibility of the entire Agile Team — not just testers or developers.'},
+{domain:'D3',ms:false,q:'How does the PO contribute to the Vision and Roadmap?',opts:['Creates the Vision independently','Understands market forces, represents end users, and educates the ART','Focuses only on technical requirements','Delegates Vision creation to Business Owners'],correct:[1],explanation:'POs contribute by understanding market forces, representing end users, assisting ART Backlog prioritisation, and educating the ART during PI Planning.'},
+{domain:'D3',ms:true,q:'Which two items are part of the SAFe Core Values?',opts:['DevOps','Decentralised decision-making','Program execution','Innovation','Built-in Quality'],correct:[2,4],explanation:'SAFe Core Values include Program Execution and Built-in Quality (among others). DevOps and Innovation are practices/competencies, not Core Values.'},
+{domain:'D3',ms:false,q:'What are the ART-level collaboration roles besides PM and PO?',opts:['Business Owners and RTE only','RTE, System Architect, System Team, Business Owners','Dev Managers and HR','Scrum Masters and POs only'],correct:[1],explanation:'Key ART roles: RTE (chief ART coach), System Architect (tech guidance), System Team (integration/tooling), Business Owners (key stakeholders).'},
+{domain:'D3',ms:false,q:'How should Product Owners apply the Lean-Agile Mindset?',opts:['Focus only on following processes strictly','Embrace Lean Thinking principles and Agile values for decision-making','Ignore customer feedback to maintain focus','Prioritise documentation over working software'],correct:[1],explanation:'The Lean-Agile Mindset guides POs to use Lean Thinking (5 principles) and Agile Values (Manifesto) in everyday decisions.'},
+{domain:'D3',ms:false,q:'What is the Agile Manifesto principle regarding business and developers?',opts:['Business people approve all technical decisions','Business people and developers must work together daily throughout the project','Developers work alone and present to business weekly','Business people review completed work only at sprint reviews'],correct:[1],explanation:'Agile Manifesto Principle 4: Business people and developers must work together daily throughout the project.'},
+{domain:'D3',ms:false,q:'What is the primary goal of the Lean-Agile Mindset for POs and PMs?',opts:['Follow SAFe ceremonies precisely','Use Lean Thinking and Agile values to make better product decisions and deliver value','Reduce the number of meetings','Focus on documentation and compliance'],correct:[1],explanation:'The Lean-Agile Mindset guides better product decisions by applying Lean principles (flow, pull, perfection) and Agile values (customer collaboration, working software).'},
+// D4 — 15 questions
+{domain:'D4',ms:false,q:'During PI Planning Day 1, what is PM\'s primary responsibility during the Vision presentation?',opts:['Present technical architecture details','Communicate how Vision aligns with Strategic Themes and present the top 10 Features','Assign specific tasks to teams','Review previous PI performance'],correct:[1],explanation:'PM communicates Vision alignment with Strategic Themes and presents the top 10 prioritised Features.'},
+{domain:'D4',ms:true,q:'What should be included when communicating the Vision during PI Planning?',opts:['How Vision aligns with Strategic Themes','User personas','Importance of NFRs','Individual performance metrics','PI Roadmap context'],correct:[0,1,2,4],explanation:'Vision presentation: Strategic Theme alignment, personas, NFRs, PI Roadmap. Individual metrics are NOT included.'},
+{domain:'D4',ms:false,q:'What are PI Objectives?',opts:['Detailed technical specs','A summary of business and technical goals each team and ART intend to achieve in the upcoming PI','Individual performance goals','Financial targets'],correct:[1],explanation:'PI Objectives are business/technical goal summaries built bottom-up by teams, rolled up to ART level.'},
+{domain:'D4',ms:false,q:'What is the purpose of uncommitted objectives?',opts:['They are extra work if teams have time','They improve predictability of delivering business value when confidence is low','They are not included in capacity planning','They are less important than committed objectives'],correct:[1],explanation:'Uncommitted objectives ARE planned, DO count toward load, and improve predictability by being honest about uncertain items.'},
+{domain:'D4',ms:true,q:'How should dependencies be managed during PI Planning?',opts:['Distribute work to other teams for bottlenecks','Adjust work sequencing to eliminate same-iteration dependencies','Ignore dependencies to maintain team autonomy','Adjust work between teams based on capacity','Split Features and Stories for complex critical paths'],correct:[0,1,3,4],explanation:'4 dependency strategies: distribute (bottlenecks), adjust sequencing, adjust between teams (capacity), split Features/Stories. Never ignore.'},
+{domain:'D4',ms:false,q:'After resolving dependencies and addressing risks during PI Planning, what follows?',opts:['Management review','Team breakouts','Confidence vote','Retrospective'],correct:[2],explanation:'PI Planning Day 2: ... → ROAM Risks → Confidence Vote → Plan Rework if needed → Planning Retrospective.'},
+{domain:'D4',ms:true,q:'What are the characteristics of effective PI Objectives using SMART criteria?',opts:['Specific – intended outcome with action verb','Measurable – descriptive, Yes/No, quantitative','Achievable – within team\'s control','Realistic – recognise uncontrollable factors','Time-bound – within the PI'],correct:[0,1,2,3,4],explanation:'All 5 SMART criteria apply to PI Objectives. Avoid jargon; describe value and impact.'},
+{domain:'D4',ms:false,q:'When should a PO develop preliminary Iteration Goals?',opts:['In a Backlog Refinement meeting','During Iteration Planning','Prior to Iteration Planning','During PI Planning'],correct:[2],explanation:'POs develop preliminary Iteration Goals PRIOR to Iteration Planning, based on PI commitments and current PI progress.'},
+{domain:'D4',ms:false,q:'Communicating Vision to the ART during PI Planning supports which SAFe Core Value?',opts:['Relentless Improvement','Alignment','Respect for People','Transparency'],correct:[1],explanation:'Vision communication creates Alignment — connecting strategy to execution across all teams.'},
+{domain:'D4',ms:false,q:'What are the 2 main purposes of PI Objectives?',opts:['Build credibility in PI Planning','Make it easier for Business Owners to report','Decentralised decision-making easier once BV is clear','Immediate feedback that teams understand desired outcomes'],correct:[2,3],explanation:'PI Objectives enable decentralised decisions (teams know what matters) and provide immediate feedback to leadership.'},
+{domain:'D4',ms:false,q:'What does the ART Planning Board visualise?',opts:['Individual developer task assignments','Team PI Objectives, milestones, and dependencies between teams','Sprint backlogs for each team','Budget allocation by team'],correct:[1],explanation:'The ART Planning Board shows team PI Objectives, milestones, and cross-team dependencies (red strings).'},
+{domain:'D4',ms:false,q:'What does a red string on the ART Planning Board indicate?',opts:['A completed dependency','A significant dependency between teams or to a milestone','A risk that has been ROAM\'d','A Feature that is blocked'],correct:[1],explanation:'Red strings (or lines on digital boards) connect Features/Milestones to their dependencies — indicating cross-team work needed.'},
+{domain:'D4',ms:false,q:'What is the purpose of the PI confidence vote?',opts:['Teams vote on which Features to include','Teams commit to doing everything possible to meet PI Objectives and escalate immediately if not achievable','Stakeholders approve the PI plan','Management selects the top PI Objectives'],correct:[1],explanation:'Confidence vote = two-part commitment: (1) do everything possible to meet objectives; (2) escalate immediately if not achievable.'},
+{domain:'D4',ms:false,q:'What is the primary consideration when sequencing Stories within Iteration Planning?',opts:['Developer preferences','Story priorities inherited from ART Backlog, events, milestones, dependencies, and local priorities','Alphabetical order of Story titles','Business Owner approval sequence'],correct:[1],explanation:'Stories are sequenced based on: ART Backlog priorities, events/milestones, team dependencies, local priorities, and capacity allocations.'},
+{domain:'D4',ms:false,q:'Who facilitates the Management Review and Problem-Solving session at end of PI Planning Day 1?',opts:['Product Management','Product Owner','Release Train Engineer (RTE)','Business Owner'],correct:[2],explanation:'The RTE facilitates the Management Review and Problem-Solving meeting at the end of Day 1 to resolve issues from draft plan reviews.'},
+// D5 — 18 questions
+{domain:'D5',ms:false,q:'What is the primary purpose of the PO Sync?',opts:['To replace team-level planning','To provide visibility into ART progress toward PI Objectives and assess scope adjustments','To conduct individual performance reviews','To plan the next release'],correct:[1],explanation:'PO Sync: visibility into ART progress vs PI Objectives + scope adjustment opportunity. Facilitated by RTE or PM.'},
+{domain:'D5',ms:true,q:'What are the key guidelines for effective System Demos?',opts:['Demo functionally complete Features','Demo from staging environment resembling production','Use test data for demonstrations','Demo occurs after Iteration Review','Demo showcases Customer value'],correct:[0,1,3,4],explanation:'System Demo: functionally complete, staging environment (NOT test data), after Iteration Review, showcase Customer value.'},
+{domain:'D5',ms:false,q:'What is the primary purpose of the IP Iteration?',opts:['To catch up on delayed work only','To provide for innovation, planning, estimating guard band, and PI Planning','To conduct administrative tasks','To take a break from development'],correct:[1],explanation:'IP Iteration: innovation + PI Planning + guard band + I&A + skills development. NOT just catch-up.'},
+{domain:'D5',ms:true,q:'What are the three parts of the Inspect and Adapt event?',opts:['PI System Demo','Individual performance reviews','Quantitative and Qualitative Measurement','Budget planning','Retrospective and Problem-Solving Workshop'],correct:[0,2,4],explanation:'I&A has exactly 3 parts: PI System Demo, Quantitative/Qualitative Measurement, Retrospective/Problem-Solving Workshop.'},
+{domain:'D5',ms:false,q:'What do Flow Metrics help measure?',opts:['Individual developer productivity','How work flows through the Continuous Delivery Pipeline','Financial performance only','Customer satisfaction scores'],correct:[1],explanation:'Flow Metrics measure how work flows through the CDP — system-level measures, not individual productivity.'},
+{domain:'D5',ms:true,q:'What are the key Flow Metrics in SAFe?',opts:['Flow Distribution','Flow Velocity','Flow Time','Flow Budget','Flow Load','Flow Efficiency'],correct:[0,1,2,4,5],explanation:'5 Flow Metrics: Distribution, Velocity, Time, Load, Efficiency. "Flow Budget" is NOT a SAFe Flow Metric.'},
+{domain:'D5',ms:false,q:'What is one anti-pattern of the Inspect and Adapt?',opts:['Teams demo their own work in the PI System Demo','Product Owners present all of the work in the PI System Demo','The RTE facilitates the problem-solving workshop','Business Owners attend the I&A event'],correct:[1],explanation:'Anti-pattern: POs presenting ALL work. Teams should demo their own features.'},
+{domain:'D5',ms:false,q:'What is one method to establish a team\'s velocity?',opts:['Use 8 points per team member','Compare average Story points completed throughout previous iterations','Ask the business owner for a target','Use the team\'s original PI Planning estimate'],correct:[1],explanation:'Velocity = average Story points completed across previous iterations.'},
+{domain:'D5',ms:false,q:'What is one anti-pattern related to the System Demo?',opts:['Demoing functionally complete Features','Team demos are accepted in place of a System Demo','Demoing from a staging environment','Business Owners attending'],correct:[1],explanation:'Accepting team-level demos as substitutes for the System Demo is an anti-pattern. The System Demo integrates ALL teams\' work.'},
+{domain:'D5',ms:false,q:'What is one benefit of constant customer feedback?',opts:['Fast learning cycles','Reduces need for face-to-face collaboration','Teams can align working days with customer schedules','Reduces the number of Features'],correct:[0],explanation:'Constant customer feedback enables fast learning cycles — a core Lean-Agile principle.'},
+{domain:'D5',ms:false,q:'Which SAFe Core Competency covers Lean strategy and investment funding?',opts:['Team and Technical Agility','Agile Product Delivery','Lean Portfolio Management','Enterprise Solution Delivery'],correct:[2],explanation:'Lean Portfolio Management (LPM) applies Lean and systems thinking to strategy, investment funding, and governance.'},
+{domain:'D5',ms:false,q:'What statement accurately describes the SAFe Backlog Model?',opts:['Stories are in the ART Backlog','Features are in the ART Backlog','Epics are in the Team Backlog','Capabilities are in the Team Backlog'],correct:[1],explanation:'Features are in the ART Backlog. Stories are in the Team Backlog. Epics are in the Portfolio Backlog.'},
+{domain:'D5',ms:false,q:'Which statement best describes the Scaled Agile Framework?',opts:['It scales Scrum to multiple Agile Teams','It provides guidelines for Project Managers','It provides strict guidelines for all daily activities','It synchronises alignment, collaboration, and delivery for large numbers of teams'],correct:[3],explanation:'SAFe synchronises alignment, collaboration, and delivery for large numbers of Agile teams.'},
+{domain:'D5',ms:false,q:'What is the recommended frequency for Iteration Planning in SAFe?',opts:['Every two PIs','Every two Iterations','Once per year','Every Iteration (every two weeks)'],correct:[3],explanation:'Iteration Planning occurs at the start of every 2-week Iteration — cadence-based, not ad-hoc.'},
+{domain:'D5',ms:false,q:'What is the primary goal of Lean-Agile Leaders in supporting ARTs?',opts:['Managing team performance reviews','Empowering teams to self-organise and make decisions','Approving all technical architecture decisions','Writing PI Objectives for each team'],correct:[1],explanation:'Lean-Agile Leaders empower teams to self-organise and make decentralised decisions — SAFe Principle #9.'},
+{domain:'D5',ms:false,q:'What is defined as a product, service, or system delivered to the Customer?',opts:['An Epic','A Capability','A Solution','A Value Stream'],correct:[2],explanation:'A Solution is a product, service, or system delivered to the Customer — internal or external.'},
+{domain:'D5',ms:false,q:'What is the purpose of a hackathon in the IP Iteration?',opts:['To catch up on missed work from previous iterations','A 1–2 day event where teams work on new ideas with whomever they want as long as it reflects the company mission, then demo results','A formal governance review of PI outcomes','A planning session for the next PI'],correct:[1],explanation:'A hackathon: 1–2 days, teams choose topic + teammates (within company mission), demo at end. Drives innovation.'},
+{domain:'D5',ms:false,q:'What is a spike in SAFe?',opts:['An overrun of planned story points','An exploration Enabler Story to gain knowledge and reduce technical risk','A critical path dependency between teams','A high-priority Feature that must be completed in IP Iteration'],correct:[1],explanation:'A spike is an exploration Enabler Story designed to gain knowledge, reduce risk of a technical approach, or increase estimate reliability.'},
+];
+
+// ═══════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════
+let cardFilter='all',filteredCards=[...flashcards],cardIndex=0;
+let quizFilter='all',activeQuiz=[],qIndex=0,qScore=0,qAnswered=false;
+let qTimer=null,qTimeLeft=5400,selectedOpts=new Set();
+let totalScore=0,totalAttempted=0;
+let domainScores={D1:{c:0,t:0},D2:{c:0,t:0},D3:{c:0,t:0},D4:{c:0,t:0},D5:{c:0,t:0}};
+
+// ═══════════════════════════════════════════════
+//  NAV
+// ═══════════════════════════════════════════════
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  ['flashcards','quiz','cheatsheet','tips'].forEach((n,i)=>{if(n===id)document.querySelectorAll('.tab')[i].classList.add('active');});
+}
+
+// ═══════════════════════════════════════════════
+//  FLASHCARDS
+// ═══════════════════════════════════════════════
+const domainColors={D1:'tag-d1',D2:'tag-d2',D3:'tag-d3',D4:'tag-d4',D5:'tag-d5'};
+function filterCards(domain,el){
+  document.querySelectorAll('#page-flashcards .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');cardFilter=domain;
+  filteredCards=domain==='all'?[...flashcards]:flashcards.filter(c=>c.domain===domain);
+  cardIndex=0;renderCard();
+}
+function renderCard(){
+  const c=filteredCards[cardIndex];
+  document.getElementById('theCard').classList.remove('flipped');
+  document.getElementById('cardTag').className='card-tag '+domainColors[c.domain];
+  document.getElementById('cardTag').textContent=c.tag;
+  document.getElementById('cardQuestion').textContent=c.q;
+  document.getElementById('cardAnswer').textContent=c.a;
+  document.getElementById('cardSource').textContent='Source: '+c.src;
+  document.getElementById('cardCounter').textContent=`Card ${cardIndex+1} of ${filteredCards.length}`;
+  document.getElementById('cardProgress').style.width=((cardIndex+1)/filteredCards.length*100)+'%';
+}
+function flipCard(){document.getElementById('theCard').classList.toggle('flipped');}
+function nextCard(){cardIndex=(cardIndex+1)%filteredCards.length;renderCard();}
+function prevCard(){cardIndex=(cardIndex-1+filteredCards.length)%filteredCards.length;renderCard();}
+function shuffleCards(){
+  for(let i=filteredCards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[filteredCards[i],filteredCards[j]]=[filteredCards[j],filteredCards[i]];}
+  cardIndex=0;renderCard();
+}
+document.addEventListener('keydown',e=>{
+  if(document.getElementById('page-flashcards').classList.contains('active')){
+    if(e.key==='ArrowRight')nextCard();
+    if(e.key==='ArrowLeft')prevCard();
+    if(e.key===' '){e.preventDefault();flipCard();}
+  }
+});
+renderCard();
+
+// ═══════════════════════════════════════════════
+//  QUIZ
+// ═══════════════════════════════════════════════
+function setQuizFilter(f,el){
+  document.querySelectorAll('#quizStart .pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');quizFilter=f;
+}
+function startQuiz(count,seconds){
+  let pool=quizFilter==='all'?[...quizData]:quizData.filter(q=>q.domain===quizFilter);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  activeQuiz=pool.slice(0,Math.min(count,pool.length));
+  qIndex=0;qScore=0;qAnswered=false;
+  domainScores={D1:{c:0,t:0},D2:{c:0,t:0},D3:{c:0,t:0},D4:{c:0,t:0},D5:{c:0,t:0}};
+  document.getElementById('quizStart').style.display='none';
+  document.getElementById('quizResults').style.display='none';
+  document.getElementById('quizActive').style.display='block';
+  qTimeLeft=seconds;
+  if(qTimer)clearInterval(qTimer);
+  qTimer=setInterval(tickTimer,1000);
+  renderQuestion();
+}
+function tickTimer(){
+  qTimeLeft--;
+  if(qTimeLeft<=0){clearInterval(qTimer);showResults();return;}
+  const m=Math.floor(qTimeLeft/60),s=qTimeLeft%60;
+  document.getElementById('qTimer').textContent=`${m}:${s.toString().padStart(2,'0')}`;
+  if(qTimeLeft<=300)document.getElementById('qTimer').style.color='#ef4444';
+}
+const domTagClass={D1:'tag-d1',D2:'tag-d2',D3:'tag-d3',D4:'tag-d4',D5:'tag-d5'};
+const domNames={D1:'Iteration Execution',D2:'PI Planning Prep',D3:'PO/PM Roles',D4:'Leading PI Planning',D5:'PI Execution'};
+function renderQuestion(){
+  const q=activeQuiz[qIndex];
+  qAnswered=false;selectedOpts.clear();
+  document.getElementById('qProgress').style.width=(qIndex/activeQuiz.length*100)+'%';
+  document.getElementById('qNum').textContent=`Q${qIndex+1} / ${activeQuiz.length}`;
+  document.getElementById('qScoreDisp').textContent=`Score: ${qScore}`;
+  const tag=document.getElementById('qDomainTag');
+  tag.className='quiz-domain-tag '+domTagClass[q.domain];tag.textContent=domNames[q.domain];
+  document.getElementById('qText').textContent=q.q;
+  document.getElementById('qMsNote').style.display=q.ms?'block':'none';
+  const fb=document.getElementById('qFeedback');fb.className='quiz-feedback';fb.textContent='';
+  document.getElementById('qNextBtn').style.display='none';
+  document.getElementById('qSubmitBtn').style.display='inline-flex';
+  document.getElementById('qSkipBtn').style.display='inline-flex';
+  const opts=document.getElementById('qOptions');opts.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const div=document.createElement('div');div.className='option';div.id=`opt-${i}`;
+    div.innerHTML=`<span class="opt-key">${String.fromCharCode(65+i)}</span>${o}`;
+    div.onclick=()=>selectOpt(i,q.ms);opts.appendChild(div);
+  });
+}
+function selectOpt(i,ms){
+  if(qAnswered)return;
+  if(ms){
+    if(selectedOpts.has(i)){selectedOpts.delete(i);document.getElementById(`opt-${i}`).classList.remove('selected');}
+    else{selectedOpts.add(i);document.getElementById(`opt-${i}`).classList.add('selected');}
+  }else{
+    document.querySelectorAll('.option').forEach(o=>o.classList.remove('selected'));
+    selectedOpts.clear();selectedOpts.add(i);document.getElementById(`opt-${i}`).classList.add('selected');
+  }
+}
+function checkAnswer(){
+  if(selectedOpts.size===0)return;
+  qAnswered=true;
+  document.getElementById('qSubmitBtn').style.display='none';
+  document.getElementById('qSkipBtn').style.display='none';
+  document.getElementById('qNextBtn').style.display='inline-flex';
+  const q=activeQuiz[qIndex];const correct=new Set(q.correct);
+  const isCorrect=selectedOpts.size===correct.size&&[...selectedOpts].every(x=>correct.has(x));
+  if(isCorrect)qScore++;
+  domainScores[q.domain].t++;if(isCorrect)domainScores[q.domain].c++;
+  document.querySelectorAll('.option').forEach((el,i)=>{
+    el.classList.add('locked');
+    if(correct.has(i))el.classList.add('correct');
+    else if(selectedOpts.has(i))el.classList.add('wrong');
+  });
+  const fb=document.getElementById('qFeedback');
+  fb.className='quiz-feedback show '+(isCorrect?'correct-fb':'wrong-fb');
+  fb.innerHTML=(isCorrect?'✅ Correct! ':'❌ Incorrect. ')+q.explanation;
+  updateGlobalScore(isCorrect);
+}
+function skipQuestion(){const q=activeQuiz[qIndex];domainScores[q.domain].t++;updateGlobalScore(false);nextQuestion();}
+function nextQuestion(){qIndex++;if(qIndex>=activeQuiz.length){clearInterval(qTimer);showResults();}else renderQuestion();}
+function updateGlobalScore(correct){totalAttempted++;if(correct)totalScore++;document.getElementById('globalScore').textContent=`Score: ${totalScore} / ${totalAttempted}`;}
+const domainFullNames={D1:'D1 Iteration Exec',D2:'D2 PI Planning',D3:'D3 PO/PM Roles',D4:'D4 Lead PI',D5:'D5 PI Execution'};
+const domainBarColors={D1:'#a89cff',D2:'#00d4aa',D3:'#ff8585',D4:'#ffd166',D5:'#7dd3fc'};
+function showResults(){
+  document.getElementById('quizActive').style.display='none';
+  const pct=Math.round(qScore/activeQuiz.length*100);const pass=pct>=80;
+  let bd='<div class="domain-breakdown">';
+  Object.entries(domainScores).forEach(([d,s])=>{
+    if(s.t===0)return;const p=Math.round(s.c/s.t*100);
+    bd+=`<div class="db-row"><div class="db-label">${domainFullNames[d]}</div><div class="db-bar"><div class="db-fill" style="width:${p}%;background:${domainBarColors[d]}"></div></div><div class="db-pct" style="color:${domainBarColors[d]}">${p}%</div></div>`;
+  });bd+='</div>';
+  document.getElementById('quizResults').style.display='block';
+  document.getElementById('quizResults').innerHTML=`
+    <div class="results-card">
+      <div class="results-score">${pct}%</div>
+      <div class="results-label">${qScore} correct out of ${activeQuiz.length} questions</div>
+      <div class="results-verdict ${pass?'verdict-pass':'verdict-fail'}">${pass?'🎉 PASSED — Exam Ready!':'📚 Keep Practising — Target 80%'}</div>
+      <div class="results-breakdown">
+        <div class="rb-item"><div class="rb-val" style="color:var(--success)">${qScore}</div><div class="rb-key">Correct</div></div>
+        <div class="rb-item"><div class="rb-val" style="color:var(--wrong)">${activeQuiz.length-qScore}</div><div class="rb-key">Wrong/Skipped</div></div>
+        <div class="rb-item"><div class="rb-val" style="color:var(--accent4)">${pct}%</div><div class="rb-key">Your Score</div></div>
+      </div>
+      <p style="font-weight:600;color:var(--muted);font-size:.84rem;margin-bottom:.75rem;text-align:left">Score by Domain:</p>
+      ${bd}
+      <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.5rem">${pass?'Great work! Aim for 90%+ consistently before the real exam.':'Review weak domains with Flashcards and Cheat Sheet, then retry.'}</p>
+      <div style="display:flex;gap:.75rem;justify-content:center;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="restartQuiz()">🔄 Try Again</button>
+        <button class="btn btn-ghost" onclick="showPage('cheatsheet')">📋 Cheat Sheet</button>
+        <button class="btn btn-ghost" onclick="showPage('flashcards')">⚡ Flashcards</button>
+      </div>
+    </div>`;
+}
+function restartQuiz(){
+  clearInterval(qTimer);
+  document.getElementById('quizResults').style.display='none';
+  document.getElementById('quizStart').style.display='block';
+  document.getElementById('qTimer').style.color='var(--accent4)';
+}
+</script>
+</body>
+</html>
